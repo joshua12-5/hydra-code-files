@@ -11,7 +11,7 @@ os.makedirs("recordings", exist_ok=True)
 
 WIDTH, HEIGHT = 640, 480
 model = YOLO("yolo11n.pt")
-CLASSES = [0, 24, 26, 28]  # person + clothing related
+CLASSES = [0, 24, 25, 26, 27, 28]  # person + items worn or carried
 
 raw_frame = None
 cv_frame = None
