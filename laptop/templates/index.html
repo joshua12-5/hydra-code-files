@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>HYDRA Control</title>
+<style>
+body {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto 240px;
+  height: 100vh;
+  background: #050b14;
+  font-family: monospace;
+}
+
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 1px solid #102a44;
+}
+
+#panel {
+  background: #0b1c2d;
+  color: #e3f7ff;
+  padding: 12px;
+}
+
+#logs {
+  grid-column: 1 / 4;
+  background: #0b1c2d;
+  color: #e3f7ff;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+button {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 8px;
+  background: #102a44;
+  color: #4fc3ff;
+  border: 1px solid #4fc3ff;
+  cursor: pointer;
+}
+
+button.active {
+  background: #00e5ff;
+  color: #000;
+}
+</style>
+</head>
+
+<body>
+
+<img src="/raw">
+<img src="/cv">
+
+<div id="panel">
+  <b>HYDRA CONTROL</b><br><br>
+  <button id="rec" onclick="toggleRec()">⏺ RECORD</button>
+  <button onclick="manualGPS()">📍 MANUAL GPS</button>
+</div>
+
+<div id="logs"></div>
+
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+<script>
+const socket = io();
+let recording = false;
+
+function toggleRec() {
+  recording = !recording;
+  socket.emit("toggle_record", recording);
+  document.getElementById("rec").classList.toggle("active", recording);
+}
+
+function manualGPS() {
+  socket.emit("manual_gps");
+}
+
+setInterval(()=>{
+  fetch("/logs")
+    .then(r=>r.json())
+    .then(d=>{
+      document.getElementById("logs").innerHTML =
+        d.map(l =>
+          `[${new Date(l.time*1000).toLocaleTimeString()}] `
+          + `LAT:${l.lat} LON:${l.lon}`
+        ).join("<br>");
+    });
+},1000);
+</script>
+
+</body>
+</html>
